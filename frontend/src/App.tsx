@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { api, type GraphData, type GraphNode, type Stats, type UploadResult } from "./api";
 import { GraphCanvas } from "./GraphCanvas";
-import { relationLabel, typeLabel } from "./labels";
+import { formatPropValue, relationLabel, typeLabel } from "./labels";
 
 export default function App() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -289,7 +289,7 @@ export default function App() {
                     .map(([k, v]) => (
                       <div key={k}>
                         <dt>{k}</dt>
-                        <dd>{String(v)}</dd>
+                        <dd>{formatPropValue(v)}</dd>
                       </div>
                     ))}
                 </dl>

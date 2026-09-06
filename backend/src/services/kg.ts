@@ -172,7 +172,7 @@ export async function getGraph(limit = 200): Promise<GraphData> {
           type: r.type,
           source: n.elementId,
           target: m.elementId,
-          properties: r.properties ?? {},
+          properties: serializeProps(r.properties ?? {}),
         });
       }
     }
@@ -227,7 +227,7 @@ export async function searchGraph(keyword: string, limit = 100): Promise<GraphDa
           type: r.type,
           source: start,
           target: end,
-          properties: r.properties ?? {},
+          properties: serializeProps(r.properties ?? {}),
         });
       }
     }
@@ -330,18 +330,56 @@ export async function deleteEntity(id: string): Promise<boolean> {
   }
 }
 
+function serializeValue(value: unknown): unknown {
+  if (value == null) return value;
+  if (typeof value !== "object") return value;
+
+  // neo4j Integer
+  if ("toNumber" in value && typeof (value as { toNumber: unknown }).toNumber === "function") {
+    return (value as { toNumber: () => number }).toNumber();
+  }
+
+  // neo4j DateTime / Date / Time / LocalDateTime / Duration
+  if ("toString" in value && typeof (value as { toString: unknown }).toString === "function") {
+    const ctor = (value as { constructor?: { name?: string } }).constructor?.name ?? "";
+    if (
+      /^(DateTime|Date|Time|LocalDateTime|LocalTime|Duration)$/.test(ctor) ||
+      ("year" in value && "month" in value && "day" in value)
+    ) {
+      return (value as { toString: () => string }).toString();
+    }
+  }
+
+  if (Array.isArray(value)) return value.map(serializeValue);
+
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    out[k] = serializeValue(v);
+  }
+  return out;
+}
+
+function serializeProps(props: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(props ?? {})) {
+    out[k] = serializeValue(v);
+  }
+  return out;
+}
+
 function toGraphNode(node: {
   elementId: string;
   labels: string[];
   properties: Record<string, unknown>;
 }): GraphNode {
   const labels = node.labels.filter((l) => l !== "Entity");
+  const properties = serializeProps(node.properties);
   return {
     id: node.elementId,
     labels: node.labels,
-    name: String(node.properties.name ?? ""),
-    type: String(node.properties.entityType ?? labels[0] ?? "Entity"),
-    properties: node.properties,
+    name: String(properties.name ?? ""),
+    type: String(properties.entityType ?? labels[0] ?? "Entity"),
+    properties,
   };
 }
 

@@ -57,3 +57,32 @@ export function typeLabel(type: string): string {
 export function relationLabel(type: string): string {
   return RELATION_LABELS[type] ?? type;
 }
+
+/** 格式化详情属性（兼容 Neo4j datetime 对象或已序列化字符串） */
+export function formatPropValue(value: unknown): string {
+  if (value == null) return "";
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  if (typeof value === "object") {
+    const obj = value as Record<string, unknown>;
+    if ("year" in obj && "month" in obj && "day" in obj) {
+      const y = Number(obj.year);
+      const m = String(Number(obj.month)).padStart(2, "0");
+      const d = String(Number(obj.day)).padStart(2, "0");
+      if ("hour" in obj) {
+        const hh = String(Number(obj.hour)).padStart(2, "0");
+        const mm = String(Number(obj.minute ?? 0)).padStart(2, "0");
+        const ss = String(Number(obj.second ?? 0)).padStart(2, "0");
+        return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+      }
+      return `${y}-${m}-${d}`;
+    }
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  }
+  return String(value);
+}
