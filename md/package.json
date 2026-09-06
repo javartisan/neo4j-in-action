@@ -1,0 +1,13 @@
+{
+  "name": "kg-docs-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build-site.mjs",
+    "clean": "rm -rf site"
+  },
+  "dependencies": {
+    "marked": "^15.0.7"
+  }
+}

@@ -24,6 +24,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Generated docs site
+md/site/
+md/node_modules/
+
 # OS
 .DS_Store
 Thumbs.db

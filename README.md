@@ -65,8 +65,18 @@ npm run dev
 backend/     Express API、文档解析、图谱写入
 frontend/    React 可视化界面
 samples/     样例研报与结构化 JSON
+md/          七大方向学习笔记 + 静态站构建脚本
 docker-compose.yml
 ```
+
+### 文档静态站
+
+```bash
+npm run docs:build     # 生成 md/site/
+npm run docs:preview   # 本地预览
+```
+
+把 `md/site/` 整目录部署到任意静态托管即可。详见 `md/README.md`。
 
 ## 文档解析说明
 

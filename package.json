@@ -12,7 +12,9 @@
     "dev:backend": "npm run dev -w backend",
     "dev:frontend": "npm run dev -w frontend",
     "build": "npm run build -w backend && npm run build -w frontend",
-    "start": "npm run start -w backend"
+    "start": "npm run start -w backend",
+    "docs:build": "npm install --prefix md && npm run build --prefix md",
+    "docs:preview": "npx --yes serve md/site"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
