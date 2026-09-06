@@ -1,0 +1,19 @@
+{
+  "entities": [
+    { "type": "Company", "name": "中芯国际", "props": { "exchange": "科创板" } },
+    { "type": "Stock", "name": "688981", "props": { "code": "688981" } },
+    { "type": "Industry", "name": "半导体" },
+    { "type": "Person", "name": "赵海军", "props": { "title": "联席CEO" } },
+    { "type": "Product", "name": "晶圆代工" },
+    { "type": "Company", "name": "华为" },
+    { "type": "Event", "name": "半导体国产替代" }
+  ],
+  "relations": [
+    { "from": "中芯国际", "to": "688981", "type": "LISTED_AS" },
+    { "from": "中芯国际", "to": "半导体", "type": "BELONGS_TO" },
+    { "from": "中芯国际", "to": "赵海军", "type": "HAS_EXECUTIVE" },
+    { "from": "中芯国际", "to": "晶圆代工", "type": "PRODUCES" },
+    { "from": "中芯国际", "to": "半导体国产替代", "type": "INVOLVES" },
+    { "from": "华为", "to": "中芯国际", "type": "RELATED_TO" }
+  ]
+}
