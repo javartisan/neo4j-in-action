@@ -1,16 +1,7 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { api, type GraphData, type GraphNode, type Stats, type UploadResult } from "./api";
 import { GraphCanvas } from "./GraphCanvas";
-
-const TYPE_LABELS: Record<string, string> = {
-  Company: "公司",
-  Stock: "股票",
-  Industry: "行业",
-  Person: "人物",
-  Product: "产品",
-  Event: "事件",
-  Document: "文档",
-};
+import { relationLabel, typeLabel } from "./labels";
 
 export default function App() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -38,6 +29,26 @@ export default function App() {
   useEffect(() => {
     refresh().catch((err: Error) => setMessage(err.message));
   }, [refresh]);
+
+  const selectedRelations = useMemo(() => {
+    if (!selected) return [];
+    return graph.edges
+      .map((e) => {
+        const source = graph.nodes.find((n) => n.id === e.source);
+        const target = graph.nodes.find((n) => n.id === e.target);
+        if (!source || !target) return null;
+        if (source.id !== selected.id && target.id !== selected.id) return null;
+        return {
+          id: e.id,
+          label: relationLabel(e.type),
+          type: e.type,
+          from: source.name,
+          to: target.name,
+          outbound: source.id === selected.id,
+        };
+      })
+      .filter((x): x is NonNullable<typeof x> => Boolean(x));
+  }, [selected, graph]);
 
   async function onUpload(file: File | null) {
     if (!file) return;
@@ -214,7 +225,7 @@ export default function App() {
                 {entities.map((e) => (
                   <li key={e.id}>
                     <button type="button" onClick={() => setSelected(e)}>
-                      <span className={`tag type-${e.type}`}>{TYPE_LABELS[e.type] ?? e.type}</span>
+                      <span className={`tag type-${e.type}`}>{typeLabel(e.type)}</span>
                       <span>{e.name}</span>
                     </button>
                   </li>
@@ -232,7 +243,7 @@ export default function App() {
               <ul className="mini">
                 {lastUpload.relations.slice(0, 8).map((r, i) => (
                   <li key={`${r.from}-${r.type}-${r.to}-${i}`}>
-                    {r.from} <em>{r.type}</em> {r.to}
+                    {r.from} <em>{relationLabel(r.type)}</em> {r.to}
                   </li>
                 ))}
               </ul>
@@ -269,7 +280,7 @@ export default function App() {
             {selected ? (
               <>
                 <p className={`tag type-${selected.type}`}>
-                  {TYPE_LABELS[selected.type] ?? selected.type}
+                  {typeLabel(selected.type)}
                 </p>
                 <h3>{selected.name}</h3>
                 <dl>
@@ -282,6 +293,26 @@ export default function App() {
                       </div>
                     ))}
                 </dl>
+                {selectedRelations.length > 0 && (
+                  <div className="rel-list">
+                    <h4>关系</h4>
+                    <ul className="mini">
+                      {selectedRelations.map((r) => (
+                        <li key={r.id}>
+                          {r.outbound ? (
+                            <>
+                              → <em>{r.label}</em> {r.to}
+                            </>
+                          ) : (
+                            <>
+                              ← <em>{r.label}</em> {r.from}
+                            </>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </>
             ) : (
               <p className="hint">点击节点查看详情</p>

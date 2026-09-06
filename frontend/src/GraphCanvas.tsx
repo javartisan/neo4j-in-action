@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ForceGraph2D from "react-force-graph-2d";
 import type { GraphData, GraphNode } from "./api";
+import { relationLabel } from "./labels";
 
 const TYPE_COLORS: Record<string, string> = {
   Company: "#0f766e",
@@ -10,6 +11,21 @@ const TYPE_COLORS: Record<string, string> = {
   Product: "#047857",
   Event: "#be123c",
   Document: "#475569",
+  BlockTrade: "#0f766e",
+  Exchange: "#1d4ed8",
+  Fund: "#047857",
+  ConvertibleBond: "#b45309",
+  GEMStock: "#7c3aed",
+  CashAccount: "#0e7490",
+  CreditAccount: "#c2410c",
+  OrderType: "#0369a1",
+  OrderStatus: "#4c1d95",
+  TradingRule: "#a16207",
+  TradingEvent: "#be123c",
+  TradingInterface: "#115e59",
+  Database: "#334155",
+  DatabaseTable: "#475569",
+  DatabaseField: "#64748b",
 };
 
 interface FgNode {
@@ -23,14 +39,20 @@ interface FgNode {
 }
 
 interface FgLink {
-  source: string;
-  target: string;
+  source: string | FgNode;
+  target: string | FgNode;
   type: string;
+  label: string;
 }
 
 interface Props {
   data: GraphData;
   onSelect: (node: GraphNode | null) => void;
+}
+
+function nodePos(n: string | FgNode): { x: number; y: number } {
+  if (typeof n === "string") return { x: 0, y: 0 };
+  return { x: n.x ?? 0, y: n.y ?? 0 };
 }
 
 export function GraphCanvas({ data, onSelect }: Props) {
@@ -71,6 +93,7 @@ export function GraphCanvas({ data, onSelect }: Props) {
         source: e.source,
         target: e.target,
         type: e.type,
+        label: relationLabel(e.type),
       }));
     return { nodes, links };
   }, [data]);
@@ -89,7 +112,7 @@ export function GraphCanvas({ data, onSelect }: Props) {
       ctx.stroke();
 
       if (globalScale > 0.55) {
-        ctx.font = `${fontSize}px Sora, sans-serif`;
+        ctx.font = `${fontSize}px Sora, "PingFang SC", sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         ctx.fillStyle = "#0c1222";
@@ -99,11 +122,34 @@ export function GraphCanvas({ data, onSelect }: Props) {
     [],
   );
 
+  const paintLink = useCallback(
+    (link: FgLink, ctx: CanvasRenderingContext2D, globalScale: number) => {
+      if (globalScale < 0.7) return;
+      const start = nodePos(link.source);
+      const end = nodePos(link.target);
+      const x = (start.x + end.x) / 2;
+      const y = (start.y + end.y) / 2;
+      const fontSize = Math.max(10 / globalScale, 2.5);
+      ctx.font = `${fontSize}px Sora, "PingFang SC", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const text = link.label;
+      const padX = 3 / globalScale;
+      const padY = 1.5 / globalScale;
+      const tw = ctx.measureText(text).width;
+      ctx.fillStyle = "rgba(244, 240, 232, 0.88)";
+      ctx.fillRect(x - tw / 2 - padX, y - fontSize / 2 - padY, tw + padX * 2, fontSize + padY * 2);
+      ctx.fillStyle = "#0f766e";
+      ctx.fillText(text, x, y);
+    },
+    [],
+  );
+
   useEffect(() => {
     const fg = fgRef.current;
     if (!fg) return;
     fg.d3Force("charge")?.strength?.(-120);
-    fg.d3Force("link")?.distance?.(70);
+    fg.d3Force("link")?.distance?.(90);
   }, [graph]);
 
   return (
@@ -120,10 +166,13 @@ export function GraphCanvas({ data, onSelect }: Props) {
           ctx.fillStyle = color;
           ctx.fill();
         }) as never}
+        linkCanvasObjectMode={() => "after"}
+        linkCanvasObject={paintLink as never}
         linkColor={() => "rgba(15, 23, 42, 0.28)"}
         linkWidth={1}
         linkDirectionalArrowLength={4}
         linkDirectionalArrowRelPos={1}
+        linkLabel={(link) => (link as FgLink).label}
         onNodeClick={(node) => onSelect((node as FgNode).raw)}
         onBackgroundClick={() => onSelect(null)}
         cooldownTicks={80}

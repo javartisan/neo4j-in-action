@@ -407,6 +407,18 @@ textarea:focus,
   word-break: break-all;
 }
 
+.detail h4 {
+  margin: 14px 0 8px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.rel-list .mini {
+  max-height: 160px;
+  overflow: auto;
+}
+
 @media (max-width: 960px) {
   .layout {
     grid-template-columns: 1fr;

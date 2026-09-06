@@ -1,0 +1,251 @@
+@prefix sec: <http://example.org/sec#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# =========================
+# 1. Classes
+# =========================
+
+sec:Business a owl:Class .
+sec:BlockTrade a owl:Class ;
+    rdfs:subClassOf sec:Business .
+
+sec:Exchange a owl:Class .
+sec:Security a owl:Class .
+sec:Stock a owl:Class ;
+    rdfs:subClassOf sec:Security .
+sec:Fund a owl:Class ;
+    rdfs:subClassOf sec:Security .
+sec:ConvertibleBond a owl:Class ;
+    rdfs:subClassOf sec:Security .
+sec:GEMStock a owl:Class ;
+    rdfs:subClassOf sec:Stock .
+
+sec:Account a owl:Class .
+sec:CashAccount a owl:Class ;
+    rdfs:subClassOf sec:Account .
+sec:CreditAccount a owl:Class ;
+    rdfs:subClassOf sec:Account .
+
+sec:Order a owl:Class .
+sec:OrderType a owl:Class .
+sec:OrderStatus a owl:Class .
+sec:TradingRule a owl:Class .
+sec:TradingEvent a owl:Class .
+sec:TradingInterface a owl:Class .
+sec:Database a owl:Class .
+sec:DatabaseTable a owl:Class .
+sec:DatabaseField a owl:Class .
+
+# =========================
+# 2. Order Status
+# =========================
+
+sec:Unreported a sec:OrderStatus ;
+    sec:statusCode "9" ;
+    rdfs:label "未报" .
+sec:Reported a sec:OrderStatus ;
+    sec:statusCode "0" ;
+    rdfs:label "已报" .
+sec:PartiallyExecuted a sec:OrderStatus ;
+    sec:statusCode "1" ;
+    rdfs:label "部成" .
+sec:Executed a sec:OrderStatus ;
+    sec:statusCode "2" ;
+    rdfs:label "已成" .
+sec:PartiallyCancelled a sec:OrderStatus ;
+    sec:statusCode "3" ;
+    rdfs:label "部撤" .
+sec:Cancelled a sec:OrderStatus ;
+    sec:statusCode "4" ;
+    rdfs:label "已撤" .
+
+# =========================
+# 3. Order Types
+# =========================
+
+sec:PricingOrder a sec:OrderType ;
+    rdfs:label "定价申报" .
+sec:ClickDealOrder a sec:OrderType ;
+    rdfs:label "点击成交申报" .
+sec:AfterHoursFixedPriceOrder a sec:OrderType ;
+    rdfs:label "盘后固定价格申报" .
+
+# =========================
+# 4. Exchanges
+# =========================
+
+sec:ShenzhenExchange a sec:Exchange ;
+    rdfs:label "深圳证券交易所" ;
+    sec:marketId "102" .
+sec:ShanghaiExchange a sec:Exchange ;
+    rdfs:label "上海证券交易所" ;
+    sec:marketId "101" .
+
+# =========================
+# 5. Securities (type individuals for support matrix)
+# =========================
+
+sec:StockType a sec:Stock ;
+    rdfs:label "股票" .
+sec:FundType a sec:Fund ;
+    rdfs:label "基金" .
+sec:ConvertibleBondType a sec:ConvertibleBond ;
+    rdfs:label "可转债" .
+sec:GEMStockType a sec:GEMStock ;
+    rdfs:label "创业板股票" .
+
+# =========================
+# 6. Business
+# =========================
+
+sec:BlockTrade_001 a sec:BlockTrade ;
+    rdfs:label "大宗交易" ;
+    sec:businessType "5" ;
+    sec:appliesTo sec:ShenzhenExchange ;
+    sec:appliesTo sec:ShanghaiExchange ;
+    sec:supportsOrderType sec:PricingOrder ;
+    sec:supportsOrderType sec:ClickDealOrder ;
+    sec:supportsOrderType sec:AfterHoursFixedPriceOrder ;
+    sec:supportsSecurity sec:StockType ;
+    sec:supportsSecurity sec:FundType ;
+    sec:supportsSecurity sec:ConvertibleBondType ;
+    sec:supportsSecurity sec:GEMStockType .
+
+# =========================
+# 7. Account Rules
+# =========================
+
+sec:CashAccount_001 a sec:CashAccount ;
+    rdfs:label "现货账户" ;
+    sec:permissionRequired false .
+
+sec:CreditAccount_001 a sec:CreditAccount ;
+    rdfs:label "信用账户" ;
+    sec:permissionRequired true ;
+    sec:permissionValidity "当日" .
+
+# =========================
+# 8. Trading Rules
+# =========================
+
+sec:AShareMinimumRequirement a sec:TradingRule ;
+    rdfs:label "A股最低申报限额" ;
+    sec:securityType sec:StockType ;
+    sec:minimumQuantity "300000" ;
+    sec:quantityUnit "股" ;
+    sec:minimumAmount "2000000" ;
+    sec:amountUnit "CNY" ;
+    sec:conditionLogic "OR" .
+
+sec:FundMinimumRequirement a sec:TradingRule ;
+    rdfs:label "基金最低申报限额" ;
+    sec:securityType sec:FundType ;
+    sec:minimumQuantity "2000000" ;
+    sec:quantityUnit "份" ;
+    sec:minimumAmount "2000000" ;
+    sec:amountUnit "CNY" ;
+    sec:conditionLogic "OR" .
+
+sec:ProtocolTradingTime a sec:TradingRule ;
+    rdfs:label "协议大宗申报时间" ;
+    sec:tradingTime "09:15-11:30" ;
+    sec:tradingTime "13:00-15:30" .
+
+sec:AfterHoursPricingTime a sec:TradingRule ;
+    rdfs:label "盘后定价申报时间" ;
+    sec:tradingTime "15:05-15:30" .
+
+sec:GEMConfirmTime a sec:TradingRule ;
+    rdfs:label "创业板成交确认时间" ;
+    sec:securityType sec:GEMStockType ;
+    sec:tradingTime "09:30-11:30" ;
+    sec:tradingTime "13:00-15:30" .
+
+# =========================
+# 9. Order Events
+# =========================
+
+sec:OrderSubmitted a sec:TradingEvent ;
+    rdfs:label "订单申报" .
+sec:OrderCancelled a sec:TradingEvent ;
+    rdfs:label "订单撤销" ;
+    sec:resultsIn sec:Cancelled .
+sec:OrderExecuted a sec:TradingEvent ;
+    rdfs:label "订单成交" ;
+    sec:resultsIn sec:Executed .
+sec:OrderPartiallyExecuted a sec:TradingEvent ;
+    rdfs:label "订单部成" ;
+    sec:resultsIn sec:PartiallyExecuted .
+sec:OrderPartiallyCancelled a sec:TradingEvent ;
+    rdfs:label "订单部撤" ;
+    sec:resultsIn sec:PartiallyCancelled .
+
+# =========================
+# 10. Database
+# =========================
+
+sec:trddb a sec:Database ;
+    rdfs:label "trddb" .
+sec:bsedb a sec:Database ;
+    rdfs:label "bsedb" .
+sec:trdconfigdb a sec:Database ;
+    rdfs:label "trdconfigdb" .
+
+sec:t_order a sec:DatabaseTable ;
+    sec:belongsTo sec:trddb .
+sec:t_order_status a sec:DatabaseTable ;
+    sec:belongsTo sec:trddb .
+sec:t_report a sec:DatabaseTable ;
+    sec:belongsTo sec:trddb .
+sec:t_stocks a sec:DatabaseTable ;
+    sec:belongsTo sec:trddb .
+sec:t_fund_asset a sec:DatabaseTable ;
+    sec:belongsTo sec:bsedb .
+sec:t_securities a sec:DatabaseTable ;
+    sec:belongsTo sec:bsedb .
+sec:t_block_trade_negotiation_info a sec:DatabaseTable ;
+    sec:belongsTo sec:trdconfigdb .
+sec:t_cash_auction_params a sec:DatabaseTable ;
+    sec:belongsTo sec:trdconfigdb .
+
+# =========================
+# 11. Interfaces
+# =========================
+
+sec:AGW_1005001000 a sec:TradingInterface ;
+    sec:interfaceCode "1005001000" ;
+    sec:providesService "大宗定价申报" ;
+    sec:writesTo sec:t_order ;
+    sec:writesTo sec:t_report .
+
+sec:DXS_123428000 a sec:TradingInterface ;
+    sec:interfaceCode "123428000" ;
+    sec:providesService "大宗交易" ;
+    sec:writesTo sec:t_order ;
+    sec:writesTo sec:t_report .
+
+sec:AGW_300002000 a sec:TradingInterface ;
+    sec:interfaceCode "300002000" ;
+    sec:providesService "订单查询" ;
+    sec:queries sec:t_order ;
+    sec:queries sec:t_order_status .
+
+sec:AGW_300003000 a sec:TradingInterface ;
+    sec:interfaceCode "300003000" ;
+    sec:providesService "成交查询" ;
+    sec:queries sec:t_report .
+
+# =========================
+# 12. Market data files → DB
+# =========================
+
+sec:securities_xml a sec:TradingInterface ;
+    rdfs:label "securities.xml" ;
+    sec:loadsInto sec:t_securities .
+
+sec:negotiationparams_xml a sec:TradingInterface ;
+    rdfs:label "negotiationparams.xml" ;
+    sec:loadsInto sec:t_block_trade_negotiation_info .

@@ -1,0 +1,388 @@
+{
+  "entities": [
+    {
+      "type": "BlockTrade",
+      "name": "大宗交易",
+      "props": {
+        "id": "BlockTrade_001",
+        "businessType": "5",
+        "alias": "大宗买卖/协议大宗交易/协议交易",
+        "definition": "达到规定最低限额的证券单笔买卖申报，买卖双方协议一致并经交易所确定成交"
+      }
+    },
+    {
+      "type": "Exchange",
+      "name": "深圳证券交易所",
+      "props": { "id": "ShenzhenExchange", "marketId": "102" }
+    },
+    {
+      "type": "Exchange",
+      "name": "上海证券交易所",
+      "props": { "id": "ShanghaiExchange", "marketId": "101" }
+    },
+    { "type": "Stock", "name": "股票", "props": { "id": "StockType" } },
+    { "type": "Fund", "name": "基金", "props": { "id": "FundType" } },
+    {
+      "type": "ConvertibleBond",
+      "name": "可转债",
+      "props": { "id": "ConvertibleBondType" }
+    },
+    {
+      "type": "GEMStock",
+      "name": "创业板股票",
+      "props": { "id": "GEMStockType" }
+    },
+    {
+      "type": "OrderType",
+      "name": "定价申报",
+      "props": { "id": "PricingOrder", "pricing": "1" }
+    },
+    {
+      "type": "OrderType",
+      "name": "点击成交申报",
+      "props": { "id": "ClickDealOrder", "pricing": "2" }
+    },
+    {
+      "type": "OrderType",
+      "name": "盘后固定价格申报",
+      "props": { "id": "AfterHoursFixedPriceOrder" }
+    },
+    {
+      "type": "OrderStatus",
+      "name": "未报",
+      "props": { "id": "Unreported", "statusCode": "9" }
+    },
+    {
+      "type": "OrderStatus",
+      "name": "已报",
+      "props": { "id": "Reported", "statusCode": "0" }
+    },
+    {
+      "type": "OrderStatus",
+      "name": "部成",
+      "props": { "id": "PartiallyExecuted", "statusCode": "1" }
+    },
+    {
+      "type": "OrderStatus",
+      "name": "已成",
+      "props": { "id": "Executed", "statusCode": "2" }
+    },
+    {
+      "type": "OrderStatus",
+      "name": "部撤",
+      "props": { "id": "PartiallyCancelled", "statusCode": "3" }
+    },
+    {
+      "type": "OrderStatus",
+      "name": "已撤",
+      "props": { "id": "Cancelled", "statusCode": "4" }
+    },
+    {
+      "type": "CashAccount",
+      "name": "现货账户",
+      "props": {
+        "id": "CashAccount_001",
+        "permissionRequired": false,
+        "note": "账户状态正常即可进行大宗交易"
+      }
+    },
+    {
+      "type": "CreditAccount",
+      "name": "信用账户",
+      "props": {
+        "id": "CreditAccount_001",
+        "permissionRequired": true,
+        "permissionValidity": "当日"
+      }
+    },
+    {
+      "type": "TradingRule",
+      "name": "A股最低申报限额",
+      "props": {
+        "id": "AShareMinimumRequirement",
+        "minimumQuantity": "300000",
+        "quantityUnit": "股",
+        "minimumAmount": "2000000",
+        "amountUnit": "CNY",
+        "conditionLogic": "OR"
+      }
+    },
+    {
+      "type": "TradingRule",
+      "name": "基金最低申报限额",
+      "props": {
+        "id": "FundMinimumRequirement",
+        "minimumQuantity": "2000000",
+        "quantityUnit": "份",
+        "minimumAmount": "2000000",
+        "amountUnit": "CNY",
+        "conditionLogic": "OR"
+      }
+    },
+    {
+      "type": "TradingRule",
+      "name": "协议大宗申报时间",
+      "props": {
+        "id": "ProtocolTradingTime",
+        "tradingTime": "09:15-11:30;13:00-15:30"
+      }
+    },
+    {
+      "type": "TradingRule",
+      "name": "盘后定价申报时间",
+      "props": {
+        "id": "AfterHoursPricingTime",
+        "tradingTime": "15:05-15:30"
+      }
+    },
+    {
+      "type": "TradingRule",
+      "name": "创业板成交确认时间",
+      "props": {
+        "id": "GEMConfirmTime",
+        "tradingTime": "09:30-11:30;13:00-15:30"
+      }
+    },
+    {
+      "type": "TradingEvent",
+      "name": "订单申报",
+      "props": { "id": "OrderSubmitted" }
+    },
+    {
+      "type": "TradingEvent",
+      "name": "订单撤销",
+      "props": { "id": "OrderCancelled" }
+    },
+    {
+      "type": "TradingEvent",
+      "name": "订单成交",
+      "props": { "id": "OrderExecuted" }
+    },
+    {
+      "type": "TradingEvent",
+      "name": "订单部成",
+      "props": { "id": "OrderPartiallyExecuted" }
+    },
+    {
+      "type": "TradingEvent",
+      "name": "订单部撤",
+      "props": { "id": "OrderPartiallyCancelled" }
+    },
+    { "type": "Database", "name": "trddb", "props": { "id": "trddb" } },
+    { "type": "Database", "name": "bsedb", "props": { "id": "bsedb" } },
+    {
+      "type": "Database",
+      "name": "trdconfigdb",
+      "props": { "id": "trdconfigdb" }
+    },
+    {
+      "type": "DatabaseTable",
+      "name": "t_order",
+      "props": { "db": "trddb", "desc": "委托/订单表" }
+    },
+    {
+      "type": "DatabaseTable",
+      "name": "t_order_status",
+      "props": { "db": "trddb", "desc": "订单状态表" }
+    },
+    {
+      "type": "DatabaseTable",
+      "name": "t_report",
+      "props": { "db": "trddb", "desc": "成交表" }
+    },
+    {
+      "type": "DatabaseTable",
+      "name": "t_stocks",
+      "props": { "db": "trddb", "desc": "持仓表" }
+    },
+    {
+      "type": "DatabaseTable",
+      "name": "t_fund_asset",
+      "props": { "db": "bsedb", "desc": "资金资产表" }
+    },
+    {
+      "type": "DatabaseTable",
+      "name": "t_securities",
+      "props": { "db": "bsedb", "desc": "证券信息表" }
+    },
+    {
+      "type": "DatabaseTable",
+      "name": "t_block_trade_negotiation_info",
+      "props": { "db": "trdconfigdb", "desc": "协议交易业务参考信息" }
+    },
+    {
+      "type": "DatabaseTable",
+      "name": "t_cash_auction_params",
+      "props": { "db": "trdconfigdb", "desc": "竞价参数表" }
+    },
+    {
+      "type": "TradingInterface",
+      "name": "AGW_1005001000",
+      "props": {
+        "interfaceCode": "1005001000",
+        "providesService": "大宗定价申报",
+        "channel": "AGW"
+      }
+    },
+    {
+      "type": "TradingInterface",
+      "name": "DXS_123428000",
+      "props": {
+        "interfaceCode": "123428000",
+        "providesService": "大宗交易",
+        "channel": "DXS"
+      }
+    },
+    {
+      "type": "TradingInterface",
+      "name": "AGW_300002000",
+      "props": {
+        "interfaceCode": "300002000",
+        "providesService": "订单查询",
+        "channel": "AGW"
+      }
+    },
+    {
+      "type": "TradingInterface",
+      "name": "AGW_300003000",
+      "props": {
+        "interfaceCode": "300003000",
+        "providesService": "成交查询",
+        "channel": "AGW"
+      }
+    },
+    {
+      "type": "TradingInterface",
+      "name": "securities.xml",
+      "props": { "providesService": "证券信息上场", "market": "深圳" }
+    },
+    {
+      "type": "TradingInterface",
+      "name": "negotiationparams.xml",
+      "props": {
+        "providesService": "协议交易业务参考信息上场",
+        "market": "深圳"
+      }
+    },
+    {
+      "type": "DatabaseField",
+      "name": "ord_status",
+      "props": { "table": "t_order_status", "desc": "申报状态" }
+    },
+    {
+      "type": "DatabaseField",
+      "name": "business_type",
+      "props": { "table": "t_order", "desc": "业务类型，大宗为5" }
+    },
+    {
+      "type": "DatabaseField",
+      "name": "bsflag",
+      "props": {
+        "table": "t_order",
+        "desc": "0w定价买/0x定价卖/0y点击买/0z点击卖"
+      }
+    }
+  ],
+  "relations": [
+    { "from": "大宗交易", "to": "深圳证券交易所", "type": "APPLIES_TO" },
+    { "from": "大宗交易", "to": "上海证券交易所", "type": "APPLIES_TO" },
+    { "from": "大宗交易", "to": "定价申报", "type": "SUPPORTS_ORDER_TYPE" },
+    {
+      "from": "大宗交易",
+      "to": "点击成交申报",
+      "type": "SUPPORTS_ORDER_TYPE"
+    },
+    {
+      "from": "大宗交易",
+      "to": "盘后固定价格申报",
+      "type": "SUPPORTS_ORDER_TYPE"
+    },
+    { "from": "大宗交易", "to": "股票", "type": "SUPPORTS_SECURITY" },
+    { "from": "大宗交易", "to": "基金", "type": "SUPPORTS_SECURITY" },
+    { "from": "大宗交易", "to": "可转债", "type": "SUPPORTS_SECURITY" },
+    { "from": "大宗交易", "to": "创业板股票", "type": "SUPPORTS_SECURITY" },
+    {
+      "from": "A股最低申报限额",
+      "to": "股票",
+      "type": "SECURITY_TYPE"
+    },
+    {
+      "from": "基金最低申报限额",
+      "to": "基金",
+      "type": "SECURITY_TYPE"
+    },
+    {
+      "from": "创业板成交确认时间",
+      "to": "创业板股票",
+      "type": "SECURITY_TYPE"
+    },
+    { "from": "订单撤销", "to": "已撤", "type": "RESULTS_IN" },
+    { "from": "订单成交", "to": "已成", "type": "RESULTS_IN" },
+    { "from": "订单部成", "to": "部成", "type": "RESULTS_IN" },
+    { "from": "订单部撤", "to": "部撤", "type": "RESULTS_IN" },
+    { "from": "t_order", "to": "trddb", "type": "BELONGS_TO" },
+    { "from": "t_order_status", "to": "trddb", "type": "BELONGS_TO" },
+    { "from": "t_report", "to": "trddb", "type": "BELONGS_TO" },
+    { "from": "t_stocks", "to": "trddb", "type": "BELONGS_TO" },
+    { "from": "t_fund_asset", "to": "bsedb", "type": "BELONGS_TO" },
+    { "from": "t_securities", "to": "bsedb", "type": "BELONGS_TO" },
+    {
+      "from": "t_block_trade_negotiation_info",
+      "to": "trdconfigdb",
+      "type": "BELONGS_TO"
+    },
+    {
+      "from": "t_cash_auction_params",
+      "to": "trdconfigdb",
+      "type": "BELONGS_TO"
+    },
+    { "from": "AGW_1005001000", "to": "t_order", "type": "WRITES_TO" },
+    { "from": "AGW_1005001000", "to": "t_report", "type": "WRITES_TO" },
+    { "from": "DXS_123428000", "to": "t_order", "type": "WRITES_TO" },
+    { "from": "DXS_123428000", "to": "t_report", "type": "WRITES_TO" },
+    { "from": "AGW_300002000", "to": "t_order", "type": "QUERIES" },
+    { "from": "AGW_300002000", "to": "t_order_status", "type": "QUERIES" },
+    { "from": "AGW_300003000", "to": "t_report", "type": "QUERIES" },
+    { "from": "securities.xml", "to": "t_securities", "type": "LOADS_INTO" },
+    {
+      "from": "negotiationparams.xml",
+      "to": "t_block_trade_negotiation_info",
+      "type": "LOADS_INTO"
+    },
+    { "from": "ord_status", "to": "t_order_status", "type": "BELONGS_TO" },
+    { "from": "business_type", "to": "t_order", "type": "BELONGS_TO" },
+    { "from": "bsflag", "to": "t_order", "type": "BELONGS_TO" },
+    {
+      "from": "大宗交易",
+      "to": "现货账户",
+      "type": "RELATED_TO",
+      "props": { "note": "无需权限" }
+    },
+    {
+      "from": "大宗交易",
+      "to": "信用账户",
+      "type": "RELATED_TO",
+      "props": { "note": "需开通权限且当日有效" }
+    },
+    {
+      "from": "大宗交易",
+      "to": "A股最低申报限额",
+      "type": "RELATED_TO"
+    },
+    {
+      "from": "大宗交易",
+      "to": "基金最低申报限额",
+      "type": "RELATED_TO"
+    },
+    {
+      "from": "大宗交易",
+      "to": "协议大宗申报时间",
+      "type": "RELATED_TO"
+    },
+    {
+      "from": "大宗交易",
+      "to": "盘后定价申报时间",
+      "type": "RELATED_TO"
+    }
+  ]
+}
